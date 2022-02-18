@@ -6,7 +6,24 @@ from .forms import CreateNewList
 # Create your views here.
 def index(response, id):
     ls = toDoList.objects.get(id=id)
-    # item = ls.item_set.get(id=id)
+
+    if response.method == "POST":
+        print(response.POST)
+        if response.POST.get("save"):
+            for item in ls.item_set.all():
+                if response.POST.get("c" + str(item.id)) == 'clicked':
+                    item.complete = True
+                else:
+                    item.complete = False
+                item.save()
+        elif response.POST.get("newItem"):
+            txt = response.POST.get('new')
+
+            if len(txt) > 1:
+                ls.item_set.create(text=txt, complete=False)
+            else:
+                print('invalid')
+
     return render(response, "main/list.html", {"name":'list', "ls":ls})
 
 def home(response):
